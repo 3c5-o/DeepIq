@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Iq - الذكاء الاصطناعي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #0a0f1d; color: #e2e8f0; min-height: 100vh; }
+        
+        .header {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 1rem;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s;
+            margin-left: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);            color: white;
+        }
+        
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn:active { transform: scale(0.98); }
+        
+        .container {
+            display: flex;
+            height: calc(100vh - 73px);
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 23, 42, 0.98);
+            border-left: 1px solid #1e293b;
+            padding: 1rem;
+            overflow-y: auto;
+            position: fixed;
+            right: -280px;
+            top: 73px;
+            height: calc(100vh - 73px);
+            transition: right 0.3s;
+            z-index: 90;
+        }
+        
+        .sidebar.open { right: 0; }
+        
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .chat-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .menu-btn {
+            background: #1e293b;
+            border: 1px solid #334155;            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            color: #e2e8f0;
+            cursor: pointer;
+        }
+        
+        .welcome {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .welcome-icon {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .welcome p {
+            color: #94a3b8;
+            max-width: 600px;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-width: 800px;
+            width: 100%;
+        }
+                .feature {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .feature i {
+            font-size: 2rem;
+            color: #6366f1;
+            margin-bottom: 0.75rem;
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 12px;
+            line-height: 1.6;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+        }
+        
+        .message.assistant {
+            align-self: flex-end;
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        
+        .input-area {
+            padding: 1rem;            border-top: 1px solid #1e293b;
+            background: rgba(15, 23, 42, 0.95);
+        }
+        
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 0.5rem;
+        }
+        
+        #userInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-size: 1rem;
+            padding: 0.5rem;
+            resize: none;
+            outline: none;
+            min-height: 44px;
+            max-height: 120px;
+        }
+        
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 15, 29, 0.95);
+            display: none;
+            align-items: center;            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+            gap: 1rem;
+        }
+        
+        .loading.active { display: flex; }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-right: 4px solid #10b981;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            z-index: 2000;
+            transition: transform 0.3s;
+            max-width: 90%;
+        }
+        
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.error { border-right-color: #ef4444; }
+        
+        .overlay {
+            position: fixed;
+            inset: 0;
+            top: 73px;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 80;
+        }
+        
+        .overlay.active { display: block; }
+        
+        .conv-item {
+            padding: 0.75rem;            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .conv-item:hover { border-color: #6366f1; }
+        .conv-item.active { border-color: #6366f1; background: rgba(99, 102, 241, 0.15); }
+        
+        @media (max-width: 768px) {
+            .features { grid-template-columns: 1fr; }
+            .message { max-width: 95%; }
+            .btn span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><i class="fas fa-brain"></i>Deep Iq</div>
+        <div>
+            <button class="btn btn-danger" onclick="clearChat()"><i class="fas fa-trash"></i><span>مسح</span></button>
+            <button class="btn btn-primary" onclick="newChat()"><i class="fas fa-plus"></i><span>جديد</span></button>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3 style="margin-bottom:1rem;"><i class="fas fa-comments"></i> المحادثات</h3>
+            <div id="convList"></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="newChat()">
+                <i class="fas fa-plus"></i> محادثة جديدة
+            </button>
+        </aside>
+
+        <main class="chat-area">
+            <div class="chat-header">
+                <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div style="font-weight:700;">مساعد الذكاء الاصطناعي</div>
+                <div style="background:rgba(99,102,241,0.2);color:#6366f1;padding:0.2rem 0.7rem;border-radius:20px;font-size:0.8rem;">DeepSeek-V4</div>
+            </div>
+
+            <div class="welcome" id="welcome">
+                <i class="fas fa-brain welcome-icon"></i>
+                <h1>مرحبًا بك في Deep Iq</h1>
+                <p>مساعد ذكاء اصطناعي متقدم للإجابة على أسئلتك ومساعدتك في البرمجة والتحليل</p>
+                <div class="features">
+                    <div class="feature"><i class="fas fa-bolt"></i><h3>سرعة فائقة</h3><p style="color:#94a3b8;font-size:0.9rem;">استجابات فورية</p></div>                    <div class="feature"><i class="fas fa-shield-alt"></i><h3>خصوصية</h3><p style="color:#94a3b8;font-size:0.9rem;">بياناتك آمنة</p></div>
+                    <div class="feature"><i class="fas fa-code"></i><h3>برمجة</h3><p style="color:#94a3b8;font-size:0.9rem;">دعم جميع اللغات</p></div>
+                </div>
+            </div>
+
+            <div class="messages" id="messages"></div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="userInput" placeholder="اكتب رسالتك..." rows="1" oninput="autoResize(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div style="color:#94a3b8;">جاري التفكير...</div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api/chat';
+        let state = { currentId: null, chats: JSON.parse(localStorage.getItem('chats')) || [] };
+
+        const $ = id => document.getElementById(id);
+        
+        function showToast(msg, isError = false) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function toggleSidebar() {
+            $('sidebar').classList.toggle('open');
+            $('overlay').classList.toggle('active');
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+            $('sendBtn').disabled = !el.value.trim();
+        }
+
+        function saveChats() {
+            localStorage.setItem('chats', JSON.stringify(state.chats));
+        }
+        function newChat() {
+            state.currentId = Date.now().toString();
+            state.chats.unshift({ id: state.currentId, title: 'محادثة جديدة', messages: [], time: new Date().toISOString() });
+            saveChats();
+            $('welcome').style.display = 'flex';
+            $('messages').style.display = 'none';
+            $('messages').innerHTML = '';
+            $('userInput').value = '';
+            autoResize($('userInput'));
+            renderConvs();
+            if (window.innerWidth <= 768) toggleSidebar();
+            showToast('تم إنشاء محادثة جديدة');
+        }
+
+        function renderConvs() {
+            const list = $('convList');
+            if (state.chats.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:2rem;">لا توجد محادثات</div>';
+                return;
+            }
+            list.innerHTML = '';
+            state.chats.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'conv-item' + (c.id === state.currentId ? ' active' : '');
+                div.innerHTML = `<div style="font-weight:600;">${c.title}</div><div style="font-size:0.75rem;color:#94a3b8;">${new Date(c.time).toLocaleDateString('ar-SA')}</div>`;
+                div.onclick = () => loadChat(c.id);
+                list.appendChild(div);
+            });
+        }
+
+        function loadChat(id) {
+            state.currentId = id;
+            const chat = state.chats.find(c => c.id === id);
+            if (!chat) return;
+            
+            $('welcome').style.display = 'none';
+            $('messages').style.display = 'flex';
+            $('messages').innerHTML = '';
+            chat.messages.forEach(m => addMessage(m.role, m.content, false));
+            renderConvs();
+            if (window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function saveCurrentChat() {
+            if (!state.currentId) return;
+            const chat = state.chats.find(c => c.id === state.currentId);
+            if (!chat) return;
+            
+            chat.messages = [];            document.querySelectorAll('.message').forEach(el => {
+                chat.messages.push({
+                    role: el.classList.contains('user') ? 'user' : 'assistant',
+                    content: el.querySelector('.msg-content').innerText
+                });
+            });
+            chat.time = new Date().toISOString();
+            saveChats();
+            renderConvs();
+        }
+
+        function clearChat() {
+            if (!state.currentId) return showToast('لا توجد محادثة حالية', true);
+            if (!confirm('مسح جميع الرسائل؟')) return;
+            const chat = state.chats.find(c => c.id === state.currentId);
+            if (chat) {
+                chat.messages = [];
+                chat.title = 'محادثة جديدة';
+                saveChats();
+                $('messages').innerHTML = '';
+                renderConvs();
+                showToast('تم المسح');
+            }
+        }
+
+        async function sendMessage() {
+            const input = $('userInput');
+            const text = input.value.trim();
+            if (!text || state.processing) return;
+
+            state.processing = true;
+            $('loading').classList.add('active');
+            $('sendBtn').disabled = true;
+
+            $('welcome').style.display = 'none';
+            $('messages').style.display = 'flex';
+
+            addMessage('user', text);
+            input.value = '';
+            autoResize(input);
+
+            try {
+                const chat = state.chats.find(c => c.id === state.currentId);
+                const history = chat ? chat.messages.map(m => ({role: m.role, content: m.content})) : [];
+                
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, history })
+                });
+                const data = await res.json();
+                
+                if (!res.ok || !data.success) throw new Error(data.error || 'فشل الاتصال');
+
+                addMessage('assistant', data.response);
+                saveCurrentChat();
+
+                // Update title
+                if (chat && chat.title === 'محادثة جديدة') {
+                    chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+                    saveChats();
+                    renderConvs();
+                }
+
+            } catch (err) {
+                console.error(err);
+                addMessage('assistant', `❌ خطأ: ${err.message}\n\nتأكد من تشغيل الخادم: node server.js`, true);
+                showToast(err.message, true);
+            } finally {
+                state.processing = false;
+                $('loading').classList.remove('active');
+                $('sendBtn').disabled = false;
+                input.focus();
+            }
+        }
+
+        function addMessage(role, content, save = true) {
+            const div = document.createElement('div');
+            div.className = 'message ' + role;
+            div.innerHTML = `
+                <div style="font-weight:600;margin-bottom:0.5rem;font-size:0.85rem;">${role === 'user' ? 'أنت' : 'المساعد'}</div>
+                <div class="msg-content" style="white-space:pre-wrap;">${content}</div>
+            `;
+            $('messages').appendChild(div);
+            $('messages').scrollTop = $('messages').scrollHeight;
+        }
+
+        // Init
+        window.onload = () => {
+            renderConvs();
+            if (state.chats.length > 0 && !state.currentId) {
+                loadChat(state.chats[0].id);
+            }
+        };
+    </script>
+</body>
+</html>
